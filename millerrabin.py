@@ -38,7 +38,7 @@ class MillerRabin:
         exp, resto = numero-1, 0
 
         while exp%2 == 0:
-            exp /= 2
+            exp //= 2
             resto += 1
         
         for i in range(iteracoes):
