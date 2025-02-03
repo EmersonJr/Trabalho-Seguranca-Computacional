@@ -7,18 +7,18 @@ class MillerRabin:
         self.rng = rnd.SystemRandom()
 
     
-    def possivelmentePrimo(self, numero, exp, resto, modulo):
+    def possivelmentePrimo(self, base, exp, resto, modulo):
         
-        inverso = pow(numero,exp,modulo)
+        inverso = pow(base,exp,modulo)
 
-        if inverso == 1 or inverso == numero-1:
+        if inverso == 1 or inverso == modulo-1:
             return True
 
 
         for i in range(resto):
             x = (x*x)%modulo
 
-            if x == numero-1:
+            if x == modulo-1:
                 return True
             
         return False
