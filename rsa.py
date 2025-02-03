@@ -1,4 +1,4 @@
-from .gen_primes import Gen_Primes
+from gen_primes import Gen_Primes
 
 class Rsa:
 
@@ -38,7 +38,7 @@ class Rsa:
 
         return:
         
-        CypherTxt: list of integers. the result of the encryption
+        CypherTxt: list of integers. the result from the encryption
         the encryption format is:
 
         C = M^e mod n
@@ -62,7 +62,7 @@ class Rsa:
 
         return:
         
-        plain_txt: list of integers. the result of the Decryption
+        plain_txt: list of integers. the result from the Decryption
         the encryption format is:
 
         M = C^d mod n

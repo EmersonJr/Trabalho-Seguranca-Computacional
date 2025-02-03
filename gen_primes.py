@@ -1,5 +1,5 @@
 import random as rnd
-from .millerrabin import MillerRabin
+from millerrabin import MillerRabin
 
 class Gen_Primes:
 
