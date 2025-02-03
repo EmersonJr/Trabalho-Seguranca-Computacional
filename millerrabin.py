@@ -9,9 +9,9 @@ class MillerRabin:
     
     def possivelmentePrimo(self, base, exp, resto, modulo):
         
-        inverso = pow(base,exp,modulo)
+        x = pow(base,exp,modulo)
 
-        if inverso == 1 or inverso == modulo-1:
+        if x == 1 or x == modulo-1:
             return True
 
 
@@ -20,6 +20,8 @@ class MillerRabin:
 
             if x == modulo-1:
                 return True
+            if x == 1:
+                return False
             
         return False
         
@@ -40,7 +42,7 @@ class MillerRabin:
             resto += 1
         
         for i in range(iteracoes):
-            baseParaTeste = self.rng.randrange(2,numero-1)
+            baseParaTeste = self.rng.randrange(2,numero-2)
             
             if self.possivelmentePrimo(baseParaTeste,exp, resto, numero) == False:
                 return False
