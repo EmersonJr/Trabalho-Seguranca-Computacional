@@ -1,10 +1,16 @@
 from gen_primes import Gen_Primes
+import hashlib
+import os
+import struct
 
 class Rsa:
 
     def __init__(self):
         
         self.generator = Gen_Primes()
+        self.hash256 = hashlib.sha256
+        self.k = 128
+        self.h_len = self.hash256().digest_size
 
     def gen_keys(self):
 
@@ -74,3 +80,54 @@ class Rsa:
             plain_txt.append(pow(num, priv_key[0], priv_key[1]))
         
         return plain_txt
+    
+
+    def create_data_block(self, l_hash, message):
+
+        ps = bytearray()
+
+        for _ in range(self.k - len(message) - (2*self.h_len) - 2):
+            ps.append(0)
+        
+        return l_hash + ps + b'\x01' + message
+
+    def mgf1(self, seed, mask_len, hash_func):
+        
+        T = bytearray()
+
+        for i in range((mask_len + self.h_len - 1) // self.h_len):
+            c = struct.pack(">I", i)
+            T += hash_func(seed + c).digest()
+
+        return T[:mask_len]
+
+    def OAEP_encrypt(self, message, pub_key, label):
+        
+        label = label.encode()
+
+        l_hash = self.hash256(label).digest()
+
+        data = self.create_data_block(l_hash,message)
+
+        seed = os.urandom(self.h_len)
+
+        data_mask = self.mgf1(seed, self.k - self.h_len - 1, self.hash256)
+
+        for i in range(len(data)):
+            data[i] = data[i] ^ data_mask[i]
+
+        data = bytes(data)
+
+        seed_mask = self.mgf1(data,self.h_len,self.hash256)
+
+        for i in range(len(seed)):
+            seed[i] = seed[i] ^ seed_mask[i]
+        
+        seed = bytes(seed)
+
+        encoded_message = b'\x00' + seed + data
+
+        return self.rsa_encrypt(encoded_message, pub_key)
+    
+    def OAEP_decrypt(self, encoded_message, priv_key):
+        return 0
