@@ -101,8 +101,11 @@ class Rsa:
 
         return T[:mask_len]
 
-    def OAEP_encrypt(self, message, pub_key, label):
+    def OAEP_encrypt(self, message, pub_key, label = ""):
         
+        if len(message) > self.k - 2 * self.h_len - 2:
+            raise NameError("Message is too long")
+
         label = label.encode()
 
         l_hash = self.hash256(label).digest()
@@ -129,5 +132,38 @@ class Rsa:
 
         return self.rsa_encrypt(encoded_message, pub_key)
     
-    def OAEP_decrypt(self, encoded_message, priv_key):
-        return 0
+    
+    def OAEP_decrypt(self, encoded_message, priv_key, label = ""):
+    
+
+        encoded_message = self.rsa_decrypt(encoded_message,priv_key)
+
+        if len(encoded_message) != self.k:
+            raise NameError("Encoded message has wrong length")
+        
+        label = label.encode()
+
+        seed = bytes(encoded_message[1:self.h_len+1])
+        data = bytes(encoded_message[self.h_len+1:])
+
+        seed_mask = self.mgf1(data, self.h_len, self.hash256)
+
+        for i in range(len(seed)):
+            seed[i] = seed[i] ^seed_mask[i]
+
+        data_mask = self.mgf1(seed, self.k-self.h_len-1, self.hash256)
+
+        for i in range(len(data)):
+            data[i] = data[i] ^ data_mask[i]
+
+        test_l = self.hash256(label).digest()
+
+        l_hash = data[:self.h_len]
+
+        if l_hash != test_l:
+            raise NameError("Incorrect label has")
+        
+        message_size = self.h_len + data[self.h_len].find(b'\x01') + 1
+        message = data[message_size:]
+
+        return message
