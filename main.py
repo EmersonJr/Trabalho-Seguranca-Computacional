@@ -5,10 +5,16 @@ import base64
 
 
 if __name__ == "__main__":
+    
     message = input("Insira uma mensagem a ser encriptada: ").encode()
 
     rsa = Rsa()
 
+    # I-a) Generating public and private key (P and Q prime numbers with 1024 bits)
+    public_key, private_key = rsa.gen_keys()
+    #I -b) Encrypting and decrypting message 
+    encrypted_message = rsa.OAEP_encrypt(message, public_key)
+    decrypted_message = rsa.OAEP_decrypt(encrypted_message, private_key)
     '''
     
     parte do OEAP
