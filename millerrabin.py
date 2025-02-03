@@ -42,6 +42,6 @@ class MillerRabin:
         for i in range(iteracoes):
             baseParaTeste = self.rng.randrange(2,numero-1)
             
-            if self.possivelmentePrimo(numero,exp, resto, baseParaTeste) == False:
+            if self.possivelmentePrimo(baseParaTeste,exp, resto, numero) == False:
                 return False
         return True
