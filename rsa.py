@@ -12,12 +12,12 @@ class Rsa:
         self.k = 128
         self.h_len = self.hash256().digest_size
 
-    def gcd_extendido(self, a, b):
+    def euclides_extendido(self, a, b):
          
         if b == 0:
             return a, 1, 0
         else:
-            gcd, num, num1 = self.gcd_extendido(b, a % b)
+            gcd, num, num1 = self.euclides_extendido(b, a % b)
             return gcd, num1, num - (a // b) * num1
         
     def gen_keys(self):
@@ -33,7 +33,7 @@ class Rsa:
 
         # Calculating the d = e^(-1) % N using the extended gcd
 
-        decrypt_exp = self.gcd_extendido(encrypt_exp, euler_totient)[1]
+        decrypt_exp = self.euclides_extendido(encrypt_exp, euler_totient)[1]
 
         if(decrypt_exp):
             decrypt_exp += euler_totient

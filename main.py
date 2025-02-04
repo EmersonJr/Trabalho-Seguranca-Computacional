@@ -20,8 +20,7 @@ if __name__ == "__main__":
     # print("Mensagem encriptada --> ", encrypted_message)
     decrypted_message = rsa.OAEP_decrypt(encrypted_message, private_key)
     # print("Mensagem decriptada --> ", decrypted_message)
-
-
+    
     # Assinatura - > 
 
     # II-1) Calculating the Hash from the messages
