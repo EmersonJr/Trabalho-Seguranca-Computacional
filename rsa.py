@@ -36,7 +36,7 @@ class Rsa:
 
         decrypt_exp = self.euclides_extendido(encrypt_exp, euler_totient)[1]
 
-        if(decrypt_exp):
+        if(decrypt_exp < 0):
             decrypt_exp += euler_totient
 
         pub_key = [encrypt_exp, mod]
