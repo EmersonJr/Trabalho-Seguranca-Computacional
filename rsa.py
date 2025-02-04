@@ -12,6 +12,14 @@ class Rsa:
         self.k = 128
         self.h_len = self.hash256().digest_size
 
+    def gcd_extendido(self, a, b):
+         
+        if b == 0:
+            return a, 1, 0
+        else:
+            gcd, num, num1 = self.gcd_extendido(b, a % b)
+            return gcd, num1, num - (a // b) * num1
+        
     def gen_keys(self):
 
         p = self.generator.gen()
@@ -23,10 +31,12 @@ class Rsa:
 
         encrypt_exp = 65587
 
-        # Calculating the d = e^(-1) % N using the euler theorem
-        # e^(-1) = e^(phi(N) - 1) % N
+        # Calculating the d = e^(-1) % N using the extended gcd
 
-        decrypt_exp = pow(encrypt_exp, euler_totient-1, mod)
+        decrypt_exp = self.gcd_extendido(encrypt_exp, euler_totient)[1]
+
+        if(decrypt_exp):
+            decrypt_exp += euler_totient
 
         pub_key = [encrypt_exp, mod]
         priv_key = [decrypt_exp, mod]
@@ -136,7 +146,7 @@ class Rsa:
     def OAEP_decrypt(self, encoded_message, priv_key, label = ""):
     
 
-        encoded_message = self.rsa_decrypt(encoded_message,priv_key)
+        encoded_message = self.rsa_decrypt(encoded_message, priv_key)
 
         if len(encoded_message) != self.k:
             raise NameError("Encoded message has wrong length")
@@ -149,7 +159,7 @@ class Rsa:
         seed_mask = self.mgf1(data, self.h_len, self.hash256)
 
         for i in range(len(seed)):
-            seed[i] = seed[i] ^seed_mask[i]
+            seed[i] = seed[i] ^ seed_mask[i]
 
         data_mask = self.mgf1(seed, self.k-self.h_len-1, self.hash256)
 
@@ -163,7 +173,7 @@ class Rsa:
         if l_hash != test_l:
             raise NameError("Incorrect label has")
         
-        message_size = self.h_len + data[self.h_len].find(b'\x01') + 1
+        message_size = self.h_len + data[self.h_len:].find(b'\x01') + 1
         message = data[message_size:]
 
         return message
