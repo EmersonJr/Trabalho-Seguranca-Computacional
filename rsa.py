@@ -31,12 +31,11 @@ class Rsa:
 
         encrypt_exp = 65537
 
-        # Calculating the d = e^(-1) % N using the euler theorem
-        # e^(-1) = e^(phi(N) - 1) % N
+        # Calculating the d = e^(-1) % N using extended euclides algo
 
         decrypt_exp = self.euclides_extendido(encrypt_exp, euler_totient)[1]
 
-        if(decrypt_exp):
+        if(decrypt_exp < 0):
             decrypt_exp += euler_totient
 
         pub_key = [encrypt_exp, mod]
@@ -85,8 +84,6 @@ class Rsa:
         M = C^d mod n
 
         '''
-
-        print(priv_key[0],priv_key[1])
 
         plain_txt = []
         for num in cypher:
@@ -185,8 +182,8 @@ class Rsa:
 
         # split the encoded message
 
-        seed = bytes(encoded_message[1:self.h_len+1])
-        data = bytes(encoded_message[self.h_len+1:])
+        seed = bytearray(encoded_message[1:self.h_len+1])
+        data = bytearray(encoded_message[self.h_len+1:])
 
         # generate the seed_mask that was used
 
@@ -219,7 +216,7 @@ class Rsa:
         
         #split the message correctly
         
-        message_size = self.h_len + data[self.h_len].find(b'\x01') + 1
+        message_size = self.h_len + data[self.h_len:].find(b'\x01') + 1
         message = data[message_size:]
 
         return message
