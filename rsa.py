@@ -89,7 +89,7 @@ class Rsa:
         for _ in range(self.k - len(message) - (2*self.h_len) - 2):
             ps.append(0)
         
-        return l_hash + ps + b'\x01' + message
+        return bytearray(l_hash + ps + b'\x01' + message)
 
     def mgf1(self, seed, mask_len, hash_func):
         
@@ -99,7 +99,7 @@ class Rsa:
             c = struct.pack(">I", i)
             T += hash_func(seed + c).digest()
 
-        return T[:mask_len]
+        return bytearray(T[:mask_len])
 
     def OAEP_encrypt(self, message, pub_key, label = ""):
         
@@ -112,7 +112,7 @@ class Rsa:
 
         data = self.create_data_block(l_hash,message)
 
-        seed = os.urandom(self.h_len)
+        seed = bytearray(os.urandom(self.h_len))
 
         data_mask = self.mgf1(seed, self.k - self.h_len - 1, self.hash256)
 
@@ -143,8 +143,8 @@ class Rsa:
         
         label = label.encode()
 
-        seed = bytes(encoded_message[1:self.h_len+1])
-        data = bytes(encoded_message[self.h_len+1:])
+        seed = bytearray(encoded_message[1:self.h_len+1])
+        data = bytearray(encoded_message[self.h_len+1:])
 
         seed_mask = self.mgf1(data, self.h_len, self.hash256)
 
